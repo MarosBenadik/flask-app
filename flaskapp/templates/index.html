@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}   
+   <h1>Welcome to the Flask App</h1>
+   <p>This is the home page.</p>
+   <br>
+   <br>
+   <p>APP VERSION: version1</p>
+   <br>
+   <br>
+   <p>APP COLOR: {{ flask_color }}</p>
+   <br>
+   <br>
+   <p>APP ENV: {{ flask_env }}</p>
+   <br>
+   <br>
+   <p>NODE NAME: {{ node_name }}</p>
+{% endblock %}
+
