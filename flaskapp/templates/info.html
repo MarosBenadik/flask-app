@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %}Info{% endblock %}
+
+{% block content %}    
+        <h1>Info Page</h1>
+        <p><strong>Time:</strong> <span id="time">{{ data.time }}</span></p>
+        <p><strong>Date:</strong> <span id="date">{{ data.date }}</span></p>
+        <p><strong>Pod Name:</strong> <span id="pod_name">{{ data.pod_name }}</span></p>
+        <p><strong>IP Address:</strong> <span id="ip_address">{{ data.ip_address }}</span></p>
+{% endblock %}
