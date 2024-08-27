@@ -10,6 +10,7 @@ import os
 FLASK_ENV = os.environ.get('FLASK_ENV', 'development')
 FLASK_COLOR = os.environ.get('FLASK_COLOR', 'NONE')
 NODE_NAME = os.environ.get('NODE_NAME', 'NONE')
+FLASK_VERSION = os.environ.get('FLASK_VERSION', 'NONE')
 
 # Set up logging
 logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s')
@@ -58,7 +59,7 @@ def hello():
             'url': PREFIX + url
         })
 
-    return render_template('index.html', endpoints=endpoints, flask_env=FLASK_ENV, flask_color=FLASK_COLOR, node_name=NODE_NAME)
+    return render_template('index.html', endpoints=endpoints, flask_env=FLASK_ENV, flask_color=FLASK_COLOR, node_name=NODE_NAME, flask_version=FLASK_VERSION)
 
 @app.route('/health')
 @REQUEST_TIME.time()
