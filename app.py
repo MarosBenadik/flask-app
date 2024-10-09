@@ -1,16 +1,51 @@
-from flask import Flask, render_template, jsonify, url_for, send_from_directory
-import logging
-import sys
+from flask import Flask, render_template, jsonify, url_for, send_from_directory, g
+import sys, os, socket, logging
 from prometheus_client import start_http_server, Summary, Counter, generate_latest, Info, Gauge
-import socket
 from datetime import datetime
-import os
+import pymysql
 
 # Access environment variables
 FLASK_ENV = os.environ.get('FLASK_ENV', 'development')
 FLASK_COLOR = os.environ.get('FLASK_COLOR', 'NONE')
 NODE_NAME = os.environ.get('NODE_NAME', 'NONE')
 FLASK_VERSION = os.environ.get('FLASK_VERSION', 'NONE')
+
+# Configuration for the MySQL connection (from environment variables)
+MYSQL_HOST = os.getenv('MYSQL_HOST', 'localhost')
+MYSQL_PORT = int(os.getenv('MYSQL_PORT', 3306))
+MYSQL_USER = os.getenv('MYSQL_USER', 'root')
+MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD', 'password')
+MYSQL_DATABASE = os.getenv('MYSQL_DATABASE', 'flaskappdb')
+
+# Define the prefix
+PREFIX = f'/{FLASK_COLOR}'
+
+# Initialize Flask app with static URL path and folder
+app = Flask(__name__, static_url_path=f'{PREFIX}/static', static_folder='static')
+
+def connect_to_database():
+    """Establishes a connection to the MySQL database."""
+    return pymysql.connect(
+        host=MYSQL_HOST,
+        port=MYSQL_PORT,
+        user=MYSQL_USER,
+        password=MYSQL_PASSWORD,
+        db=MYSQL_DATABASE,
+        cursorclass=pymysql.cursors.DictCursor
+    )
+
+with app.app_context():
+    """Connects to the database when the Flask app starts."""
+    g.db = connect_to_database()
+    logger.info("Database connected")
+
+@app.teardown_appcontext
+def close_db_connection(exception):
+    """Closes the database connection when the request ends."""
+    db = g.pop('db', None)
+    if db is not None:
+        db.close()
+        logger.info("Database disconnected")
 
 # Set up logging
 logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s')
@@ -22,11 +57,6 @@ REQUEST_COUNTER = Counter('app_requests_total', 'Total app requests', ['http_met
 APP_INFO = Info('app_info', 'App info')
 REQUEST_GAUGE  = Gauge('app_requests_gauge', 'Description of gauge')
 
-# Define the prefix
-PREFIX = f'/{FLASK_COLOR}'
-
-# Initialize Flask app with static URL path and folder
-app = Flask(__name__, static_url_path=f'{PREFIX}/static', static_folder='static')
 APP_INFO.info({'version': '1.0.0', 'runtime_host': NODE_NAME, 'app_color' : FLASK_COLOR, 'app_env' : FLASK_ENV})
 
 
@@ -40,6 +70,10 @@ def serve_static(path):
 def hello():
     logger.info("Main route accessed")
     REQUEST_COUNTER.labels(http_method='GET', url_path='/', status_code='200').inc()
+    """Example route to check database connection."""
+    cursor = g.db.cursor()
+    db_status = cursor.execute("SELECT 'Hello, MySQL!' AS message")
+    cursor.close()
 
     endpoints = []
 
@@ -59,7 +93,7 @@ def hello():
             'url': PREFIX + url
         })
 
-    return render_template('index.html', endpoints=endpoints, flask_env=FLASK_ENV, flask_color=FLASK_COLOR, node_name=NODE_NAME, flask_version=FLASK_VERSION)
+    return render_template('index.html', endpoints=endpoints, flask_env=FLASK_ENV, flask_color=FLASK_COLOR, node_name=NODE_NAME, flask_version=FLASK_VERSION, db_status=db_status)
 
 @app.route('/health')
 @REQUEST_TIME.time()
@@ -67,6 +101,52 @@ def hello():
 def health():
     logger.info("Health route accessed")
     return jsonify(status="UP")
+
+
+@app.route('/data')
+@REQUEST_TIME.time()
+@REQUEST_GAUGE.track_inprogress()
+def data():
+    """Endpoint to display database summary and data."""
+    cursor = g.db.cursor()
+
+    # Fetch total counts for each table
+    cursor.execute("SELECT COUNT(*) AS total_users FROM users;")
+    total_users = cursor.fetchone()['total_users']
+
+    cursor.execute("SELECT COUNT(*) AS total_posts FROM posts;")
+    total_posts = cursor.fetchone()['total_posts']
+
+    cursor.execute("SELECT COUNT(*) AS total_comments FROM comments;")
+    total_comments = cursor.fetchone()['total_comments']
+
+    # Fetch all data from each table
+    cursor.execute("SELECT * FROM users;")
+    users = cursor.fetchall()
+
+    cursor.execute("SELECT * FROM posts;")
+    posts = cursor.fetchall()
+
+    cursor.execute("SELECT * FROM comments;")
+    comments = cursor.fetchall()
+
+    cursor.close()
+
+    # Render the template with the data
+    return render_template(
+        'data.html',
+        total_users=total_users,
+        total_posts=total_posts,
+        total_comments=total_comments,
+        users=users,
+        posts=posts,
+        comments=comments,
+        flask_version="1.0.0",  # Example value; change as necessary
+        flask_color="blue",      # Example value; change as necessary
+        flask_env=os.getenv('FLASK_ENV', 'development'),
+        node_name=os.getenv('NODE_NAME', 'unknown')
+    )
+
 
 @app.route('/info')
 @REQUEST_TIME.time()

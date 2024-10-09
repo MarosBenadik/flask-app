@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Data Summary{% endblock %}
+
+{% block content %}
+   <h1>Database Data Summary</h1>
+   <br>
+   <br>
+   <p>APP VERSION: {{ flask_version }}</p>
+   <br>
+   <br>
+   <p>APP COLOR: {{ flask_color }}</p>
+   <br>
+   <br>
+   <p>APP ENV: {{ flask_env }}</p>
+   <br>
+   <br>
+   <p>NODE NAME: {{ node_name }}</p>
+   <br>
+   <br>
+   
+   <h2>Database Summary</h2>
+   <p>Total Users: {{ total_users }}</p>
+   <p>Total Posts: {{ total_posts }}</p>
+   <p>Total Comments: {{ total_comments }}</p>
+   <br>
+
+   <h2>Users</h2>
+   <ul>
+   {% for user in users %}
+       <li>ID: {{ user.id }}, Name: {{ user.name }}</li>
+   {% endfor %}
+   </ul>
+
+   <h2>Posts</h2>
+   <ul>
+   {% for post in posts %}
+       <li>Post ID: {{ post.id }}, Title: {{ post.title }}, User ID: {{ post.user_id }}</li>
+   {% endfor %}
+   </ul>
+
+   <h2>Comments</h2>
+   <ul>
+   {% for comment in comments %}
+       <li>Comment ID: {{ comment.id }}, Content: {{ comment.content }}, Post ID: {{ comment.post_id }}, User ID: {{ comment.user_id }}</li>
+   {% endfor %}
+   </ul>
+{% endblock %}
