@@ -294,14 +294,54 @@ def list_endpoints():
     return render_template('endpoints.html', endpoints=endpoints)
 
 @app.errorhandler(404)
+@REQUEST_TIME.time()
+@REQUEST_GAUGE.track_inprogress()
 def page_not_found(e):
     logger.error(f"Page not found: {e}")
-    return render_template('404.html'), 404
+    REQUEST_COUNTER.labels(http_method='GET', url_path='/404', status_code='404').inc()
+    endpoints = []
+    
+    for rule in app.url_map.iter_rules():
+        # Skip the `static` endpoint and any other endpoints with parameters
+        if rule.endpoint == 'static' or rule.arguments:
+            continue
+        
+        try:
+            url = url_for(rule.endpoint, **(rule.defaults or {}))
+        except TypeError:
+            url = url_for(rule.endpoint)  # Handle endpoints with missing parameters
+        
+        endpoints.append({
+            'endpoint': rule.endpoint,
+            'methods': list(rule.methods),
+            'url': PREFIX + url
+        })
+    return render_template('404.html', endpoints=endpoints), 404
 
 @app.errorhandler(500)
+@REQUEST_TIME.time()
+@REQUEST_GAUGE.track_inprogress()
 def internal_server_error(e):
     logger.error(f"Server error: {e}")
-    return render_template('500.html'), 500
+    REQUEST_COUNTER.labels(http_method='GET', url_path='/500', status_code='500').inc()
+    endpoints = []
+    
+    for rule in app.url_map.iter_rules():
+        # Skip the `static` endpoint and any other endpoints with parameters
+        if rule.endpoint == 'static' or rule.arguments:
+            continue
+        
+        try:
+            url = url_for(rule.endpoint, **(rule.defaults or {}))
+        except TypeError:
+            url = url_for(rule.endpoint)  # Handle endpoints with missing parameters
+        
+        endpoints.append({
+            'endpoint': rule.endpoint,
+            'methods': list(rule.methods),
+            'url': PREFIX + url
+        })
+    return render_template('500.html', endpoints=endpoints), 500
 
 if __name__ == '__main__':
     # Start Prometheus metrics server
