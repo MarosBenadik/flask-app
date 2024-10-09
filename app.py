@@ -17,6 +17,18 @@ MYSQL_USER = os.getenv('MYSQL_USER', 'root')
 MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD', 'password')
 MYSQL_DATABASE = os.getenv('MYSQL_DATABASE', 'flaskappdb')
 
+# Set up logging
+logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s')
+logger = logging.getLogger(__name__)
+
+# Prometheus metrics
+REQUEST_TIME = Summary('app_processing_seconds', 'Time spent processing request')
+REQUEST_COUNTER = Counter('app_requests_total', 'Total app requests', ['http_method', 'url_path', 'status_code'])
+APP_INFO = Info('app_info', 'App info')
+REQUEST_GAUGE  = Gauge('app_requests_gauge', 'Description of gauge')
+
+APP_INFO.info({'version': '1.0.0', 'runtime_host': NODE_NAME, 'app_color' : FLASK_COLOR, 'app_env' : FLASK_ENV})
+
 # Define the prefix
 PREFIX = f'/{FLASK_COLOR}'
 
@@ -46,19 +58,6 @@ def close_db_connection(exception):
     if db is not None:
         db.close()
         logger.info("Database disconnected")
-
-# Set up logging
-logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s')
-logger = logging.getLogger(__name__)
-
-# Prometheus metrics
-REQUEST_TIME = Summary('app_processing_seconds', 'Time spent processing request')
-REQUEST_COUNTER = Counter('app_requests_total', 'Total app requests', ['http_method', 'url_path', 'status_code'])
-APP_INFO = Info('app_info', 'App info')
-REQUEST_GAUGE  = Gauge('app_requests_gauge', 'Description of gauge')
-
-APP_INFO.info({'version': '1.0.0', 'runtime_host': NODE_NAME, 'app_color' : FLASK_COLOR, 'app_env' : FLASK_ENV})
-
 
 @app.route('/static/<path:path>')
 def serve_static(path):
