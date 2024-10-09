@@ -136,9 +136,28 @@ def data():
 
     cursor.close()
 
+    endpoints = []
+
+    for rule in app.url_map.iter_rules():
+        # Skip the `static` endpoint and any other endpoints with parameters
+        if rule.endpoint == 'static' or rule.arguments:
+            continue
+
+        try:
+            url = url_for(rule.endpoint, **(rule.defaults or {}))
+        except TypeError:
+            url = url_for(rule.endpoint)  # Handle endpoints with missing parameters
+
+        endpoints.append({
+            'endpoint': rule.endpoint,
+            'methods': list(rule.methods),
+            'url': PREFIX + url
+        })
+
     # Render the template with the data
     return render_template(
         'data.html',
+        endpoints=endpoints,
         total_users=total_users,
         total_posts=total_posts,
         total_comments=total_comments,
