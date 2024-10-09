@@ -70,6 +70,9 @@ def hello():
     logger.info("Main route accessed")
     REQUEST_COUNTER.labels(http_method='GET', url_path='/', status_code='200').inc()
     """Example route to check database connection."""
+    if 'db' not in g:
+        g.db = connect_to_database()
+        
     cursor = g.db.cursor()
     db_status = cursor.execute("SELECT 'Hello, MySQL!' AS message")
     cursor.close()
@@ -107,6 +110,8 @@ def health():
 @REQUEST_GAUGE.track_inprogress()
 def data():
     """Endpoint to display database summary and data."""
+    if 'db' not in g:
+        g.db = connect_to_database()
     cursor = g.db.cursor()
 
     # Fetch total counts for each table
