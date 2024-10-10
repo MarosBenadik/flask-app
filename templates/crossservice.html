@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}CrossService{% endblock %}
+
+{% block content %}   
+   <h1>This are data from {{ crossservice }}</h1>
+   <br>
+   <br>
+   <p>POD NAME: {{ response.pod_name }}</p>
+   <br>
+   <br>
+   <p>IP ADDRESS: {{ response.ip_address }}</p>
+   <br>
+   <br>
+   <p>APP ENV: {{ response.date }}</p>
+   <br>
+   <br>
+   <p>NODE NAME: {{ response.time }}</p>
+   <br>
+   <br>
+{% endblock %}
