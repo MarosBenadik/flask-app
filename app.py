@@ -125,8 +125,18 @@ def crossservice():
     logger.info(f"endpoints: {endpoints}")
     # Call the /data endpoint on Flask App 2
     response = requests.get(f'http://{CROSSSERVICE_NAME}.default.svc.cluster.local:5000/info/data')
-    logger.info(f"response: {response}")
-    return render_template('crossservice.html', response=response, endpoints=endpoints, crossservice=CROSSSERVICE_NAME)
+
+        # Parse the response as JSON
+    try:
+        response_data = response.json()
+        logger.info(f"Response data (JSON): {response_data}")
+    except ValueError as e:
+        # Handle error if response is not valid JSON
+        logger.error(f"Failed to parse JSON response: {e}")
+        response_data = "Invalid JSON response"
+
+    logger.info(f"response: {response_data}")
+    return render_template('crossservice.html', response=response_data, endpoints=endpoints, crossservice=CROSSSERVICE_NAME)
 
 @app.route('/data')
 @REQUEST_TIME.time()
