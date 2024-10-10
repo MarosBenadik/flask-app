@@ -9,7 +9,7 @@ FLASK_ENV = os.environ.get('FLASK_ENV', 'development')
 FLASK_COLOR = os.environ.get('FLASK_COLOR', 'NONE')
 NODE_NAME = os.environ.get('NODE_NAME', 'NONE')
 FLASK_VERSION = os.environ.get('FLASK_VERSION', 'NONE')
-CROSSSERVICE_NAME = os.getenv('CROSSSERVICE_NAME', 'flask-blue-flaskapp-chart')  
+CROSSSERVICE_NAME = os.environ.get('CROSSSERVICE_NAME', 'flask-blue-flaskapp-chart')  
 
 # Configuration for the MySQL connection (from environment variables)
 MYSQL_HOST = os.getenv('MYSQL_HOST', 'localhost')
