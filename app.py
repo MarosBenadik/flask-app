@@ -122,10 +122,10 @@ def crossservice():
             'methods': list(rule.methods),
             'url': PREFIX + url
         })
-    
+    logger.info(f"endpoints: {endpoints}")
     # Call the /data endpoint on Flask App 2
     response = requests.get(f'http://{CROSSSERVICE_NAME}.default.svc.cluster.local:5000/info/data')
-
+    logger.info(f"response: {response}")
     return render_template('crossservice.html', response=response, endpoints=endpoints, crossservice=CROSSSERVICE_NAME)
 
 @app.route('/data')
