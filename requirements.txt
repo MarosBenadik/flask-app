@@ -3,3 +3,4 @@ prometheus_client==0.12.0
 Werkzeug==2.3.6
 pymysql
 requests
+pika
