@@ -3,6 +3,7 @@ import sys, logging
 from prometheus_client import start_http_server
 from routes import register_routes
 from tools.metrics import FLASK_COLOR
+from tools.tools import connect_to_database
 
 # Set up logging
 logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s')
