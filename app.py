@@ -1,5 +1,5 @@
 from flask import Flask, render_template, jsonify, url_for, send_from_directory, g
-import sys, os, socket, logging
+import sys, os, socket, logging, requests
 from prometheus_client import start_http_server, Summary, Counter, generate_latest, Info, Gauge
 from datetime import datetime
 import pymysql
@@ -9,6 +9,7 @@ FLASK_ENV = os.environ.get('FLASK_ENV', 'development')
 FLASK_COLOR = os.environ.get('FLASK_COLOR', 'NONE')
 NODE_NAME = os.environ.get('NODE_NAME', 'NONE')
 FLASK_VERSION = os.environ.get('FLASK_VERSION', 'NONE')
+CROSSSERVICE_NAME = os.environ.get('CROSSSERVICE_NAME', 'flask-blue-flaskapp-chart')  
 
 # Configuration for the MySQL connection (from environment variables)
 MYSQL_HOST = os.getenv('MYSQL_HOST', 'localhost')
@@ -16,6 +17,18 @@ MYSQL_PORT = int(os.getenv('MYSQL_PORT', 3306))
 MYSQL_USER = os.getenv('MYSQL_USER', 'root')
 MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD', 'password')
 MYSQL_DATABASE = os.getenv('MYSQL_DATABASE', 'flaskappdb')
+
+# Set up logging
+logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s')
+logger = logging.getLogger(__name__)
+
+# Prometheus metrics
+REQUEST_TIME = Summary('app_processing_seconds', 'Time spent processing request')
+REQUEST_COUNTER = Counter('app_requests_total', 'Total app requests', ['http_method', 'url_path', 'status_code'])
+APP_INFO = Info('app_info', 'App info')
+REQUEST_GAUGE  = Gauge('app_requests_gauge', 'Description of gauge')
+
+APP_INFO.info({'version': '1.0.0', 'runtime_host': NODE_NAME, 'app_color' : FLASK_COLOR, 'app_env' : FLASK_ENV})
 
 # Define the prefix
 PREFIX = f'/{FLASK_COLOR}'
@@ -47,19 +60,6 @@ def close_db_connection(exception):
         db.close()
         logger.info("Database disconnected")
 
-# Set up logging
-logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s')
-logger = logging.getLogger(__name__)
-
-# Prometheus metrics
-REQUEST_TIME = Summary('app_processing_seconds', 'Time spent processing request')
-REQUEST_COUNTER = Counter('app_requests_total', 'Total app requests', ['http_method', 'url_path', 'status_code'])
-APP_INFO = Info('app_info', 'App info')
-REQUEST_GAUGE  = Gauge('app_requests_gauge', 'Description of gauge')
-
-APP_INFO.info({'version': '1.0.0', 'runtime_host': NODE_NAME, 'app_color' : FLASK_COLOR, 'app_env' : FLASK_ENV})
-
-
 @app.route('/static/<path:path>')
 def serve_static(path):
     return send_from_directory('static', path)
@@ -71,6 +71,9 @@ def hello():
     logger.info("Main route accessed")
     REQUEST_COUNTER.labels(http_method='GET', url_path='/', status_code='200').inc()
     """Example route to check database connection."""
+    if 'db' not in g:
+        g.db = connect_to_database()
+        
     cursor = g.db.cursor()
     db_status = cursor.execute("SELECT 'Hello, MySQL!' AS message")
     cursor.close()
@@ -95,19 +98,53 @@ def hello():
 
     return render_template('index.html', endpoints=endpoints, flask_env=FLASK_ENV, flask_color=FLASK_COLOR, node_name=NODE_NAME, flask_version=FLASK_VERSION, db_status=db_status)
 
-@app.route('/health')
+@app.route('/crossservice')
 @REQUEST_TIME.time()
 @REQUEST_GAUGE.track_inprogress()
-def health():
-    logger.info("Health route accessed")
-    return jsonify(status="UP")
+def crossservice():
+    logger.info("CrossService route accessed")
+    REQUEST_COUNTER.labels(http_method='GET', url_path='/crossservice', status_code='200').inc()
 
+    endpoints = []
+
+    for rule in app.url_map.iter_rules():
+        # Skip the `static` endpoint and any other endpoints with parameters
+        if rule.endpoint == 'static' or rule.arguments:
+            continue
+
+        try:
+            url = url_for(rule.endpoint, **(rule.defaults or {}))
+        except TypeError:
+            url = url_for(rule.endpoint)  # Handle endpoints with missing parameters
+
+        endpoints.append({
+            'endpoint': rule.endpoint,
+            'methods': list(rule.methods),
+            'url': PREFIX + url
+        })
+    logger.info(f"endpoints: {endpoints}")
+    # Call the /data endpoint on Flask App 2
+    response = requests.get(f'http://{CROSSSERVICE_NAME}.default.svc.cluster.local:5000/info/data')
+
+        # Parse the response as JSON
+    try:
+        response_data = response.json()
+        logger.info(f"Response data (JSON): {response_data}")
+    except ValueError as e:
+        # Handle error if response is not valid JSON
+        logger.error(f"Failed to parse JSON response: {e}")
+        response_data = "Invalid JSON response"
+
+    logger.info(f"response: {response_data}")
+    return render_template('crossservice.html', response=response_data, endpoints=endpoints, crossservice=CROSSSERVICE_NAME)
 
 @app.route('/data')
 @REQUEST_TIME.time()
 @REQUEST_GAUGE.track_inprogress()
 def data():
     """Endpoint to display database summary and data."""
+    if 'db' not in g:
+        g.db = connect_to_database()
     cursor = g.db.cursor()
 
     # Fetch total counts for each table
@@ -132,9 +169,28 @@ def data():
 
     cursor.close()
 
+    endpoints = []
+
+    for rule in app.url_map.iter_rules():
+        # Skip the `static` endpoint and any other endpoints with parameters
+        if rule.endpoint == 'static' or rule.arguments:
+            continue
+
+        try:
+            url = url_for(rule.endpoint, **(rule.defaults or {}))
+        except TypeError:
+            url = url_for(rule.endpoint)  # Handle endpoints with missing parameters
+
+        endpoints.append({
+            'endpoint': rule.endpoint,
+            'methods': list(rule.methods),
+            'url': PREFIX + url
+        })
+
     # Render the template with the data
     return render_template(
         'data.html',
+        endpoints=endpoints,
         total_users=total_users,
         total_posts=total_posts,
         total_comments=total_comments,
@@ -185,28 +241,31 @@ def info():
     }
     return render_template('info.html', data=data, endpoints=endpoints)
 
-@app.route('/metrics')
-def metrics():
-    return generate_latest(), 200
-
-@app.route('/info/data')
+@app.route('/endpoints')
 @REQUEST_TIME.time()
 @REQUEST_GAUGE.track_inprogress()
-def get_info():
-    logger.info("Info data endpoint accessed")
-    REQUEST_COUNTER.labels(http_method='POST', url_path='/info/data', status_code='200').inc()
-    pod_name = socket.gethostname()
-    ip_address = socket.gethostbyname(pod_name)
-    current_time = datetime.now().strftime('%H:%M:%S')
-    current_date = datetime.now().strftime('%Y-%m-%d')
-
-    data = {
-        'time': current_time,
-        'date': current_date,
-        'pod_name': pod_name,
-        'ip_address': ip_address
-    }
-    return jsonify(data)
+def list_endpoints():
+    logger.info("Endpoints route accessed")
+    REQUEST_COUNTER.labels(http_method='GET', url_path='/endpoints', status_code='200').inc()
+    endpoints = []
+    
+    for rule in app.url_map.iter_rules():
+        # Skip the `static` endpoint and any other endpoints with parameters
+        if rule.endpoint == 'static' or rule.arguments:
+            continue
+        
+        try:
+            url = url_for(rule.endpoint, **(rule.defaults or {}))
+        except TypeError:
+            url = url_for(rule.endpoint)  # Handle endpoints with missing parameters
+        
+        endpoints.append({
+            'endpoint': rule.endpoint,
+            'methods': list(rule.methods),
+            'url': PREFIX + url
+        })
+        
+    return render_template('endpoints.html', endpoints=endpoints)
 
 @app.route('/help')
 @REQUEST_TIME.time()
@@ -244,12 +303,20 @@ def help():
     }
     return render_template('help.html', help_info=help_info, endpoints=endpoints)
 
-@app.route('/endpoints')
+@app.route('/health')
 @REQUEST_TIME.time()
 @REQUEST_GAUGE.track_inprogress()
-def list_endpoints():
-    logger.info("Endpoints route accessed")
-    REQUEST_COUNTER.labels(http_method='GET', url_path='/endpoints', status_code='200').inc()
+def health():
+    logger.info("Health route accessed")
+    return jsonify(status="UP")
+
+
+@app.errorhandler(404)
+@REQUEST_TIME.time()
+@REQUEST_GAUGE.track_inprogress()
+def page_not_found(e):
+    logger.error(f"Page not found: {e}")
+    REQUEST_COUNTER.labels(http_method='GET', url_path='/404', status_code='404').inc()
     endpoints = []
     
     for rule in app.url_map.iter_rules():
@@ -267,18 +334,55 @@ def list_endpoints():
             'methods': list(rule.methods),
             'url': PREFIX + url
         })
-        
-    return render_template('endpoints.html', endpoints=endpoints)
+    return render_template('404.html', endpoints=endpoints), 404
 
-@app.errorhandler(404)
-def page_not_found(e):
-    logger.error(f"Page not found: {e}")
-    return render_template('404.html'), 404
+@app.route('/metrics')
+def metrics():
+    return generate_latest(), 200
+
+@app.route('/info/data')
+@REQUEST_TIME.time()
+@REQUEST_GAUGE.track_inprogress()
+def get_info():
+    logger.info("Info data endpoint accessed")
+    REQUEST_COUNTER.labels(http_method='POST', url_path='/info/data', status_code='200').inc()
+    pod_name = socket.gethostname()
+    ip_address = socket.gethostbyname(pod_name)
+    current_time = datetime.now().strftime('%H:%M:%S')
+    current_date = datetime.now().strftime('%Y-%m-%d')
+
+    data = {
+        'time': current_time,
+        'date': current_date,
+        'pod_name': pod_name,
+        'ip_address': ip_address
+    }
+    return jsonify(data)
 
 @app.errorhandler(500)
+@REQUEST_TIME.time()
+@REQUEST_GAUGE.track_inprogress()
 def internal_server_error(e):
     logger.error(f"Server error: {e}")
-    return render_template('500.html'), 500
+    REQUEST_COUNTER.labels(http_method='GET', url_path='/500', status_code='500').inc()
+    endpoints = []
+    
+    for rule in app.url_map.iter_rules():
+        # Skip the `static` endpoint and any other endpoints with parameters
+        if rule.endpoint == 'static' or rule.arguments:
+            continue
+        
+        try:
+            url = url_for(rule.endpoint, **(rule.defaults or {}))
+        except TypeError:
+            url = url_for(rule.endpoint)  # Handle endpoints with missing parameters
+        
+        endpoints.append({
+            'endpoint': rule.endpoint,
+            'methods': list(rule.methods),
+            'url': PREFIX + url
+        })
+    return render_template('500.html', endpoints=endpoints), 500
 
 if __name__ == '__main__':
     # Start Prometheus metrics server
