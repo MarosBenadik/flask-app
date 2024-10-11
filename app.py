@@ -1,5 +1,6 @@
 from flask import Flask, send_from_directory, g
 import sys, logging
+from prometheus_client import start_http_server
 from routes import register_routes
 from tools.metrics import FLASK_COLOR
 
@@ -15,11 +16,11 @@ app = Flask(__name__, static_url_path=f'{PREFIX}/static', static_folder='static'
 
 with app.app_context():
     print("Hello Flask app")
-    """Connects to the database when the Flask app starts."""
-    g.db = connect_to_database()
-    logger.info("Database connected")
+    #"""Connects to the database when the Flask app starts."""
+    #g.db = connect_to_database()
+    #logger.info("Database connected")
 
-@app.teardown_appcontext
+#@app.teardown_appcontext
 def close_db_connection(exception):
     """Closes the database connection when the request ends."""
     db = g.pop('db', None)
