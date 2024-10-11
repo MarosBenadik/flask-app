@@ -39,4 +39,4 @@ if __name__ == '__main__':
     # Start Prometheus metrics server
     logger.info("APP has Started")
     start_http_server(8000)
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000)
