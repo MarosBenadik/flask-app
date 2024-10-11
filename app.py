@@ -1,8 +1,5 @@
-from flask import Flask, render_template, jsonify, url_for, send_from_directory, g
-import sys, os, socket, logging, requests
-from prometheus_client import start_http_server, Summary, Counter, generate_latest, Info, Gauge
-from datetime import datetime
-import pymysql
+from flask import Flask, send_from_directory, g
+import sys, logging
 from routes import register_routes
 from tools.metrics import FLASK_COLOR
 
