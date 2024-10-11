@@ -4,20 +4,7 @@ from prometheus_client import start_http_server, Summary, Counter, generate_late
 from datetime import datetime
 import pymysql
 from routes import register_routes
-
-# Access environment variables
-FLASK_ENV = os.environ.get('FLASK_ENV', 'development')
-FLASK_COLOR = os.environ.get('FLASK_COLOR', 'NONE')
-NODE_NAME = os.environ.get('NODE_NAME', 'NONE')
-FLASK_VERSION = os.environ.get('FLASK_VERSION', 'NONE')
-CROSSSERVICE_NAME = os.environ.get('CROSSSERVICE_NAME', 'flask-blue-flaskapp-chart')  
-
-# Configuration for the MySQL connection (from environment variables)
-MYSQL_HOST = os.getenv('MYSQL_HOST', 'localhost')
-MYSQL_PORT = int(os.getenv('MYSQL_PORT', 3306))
-MYSQL_USER = os.getenv('MYSQL_USER', 'root')
-MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD', 'password')
-MYSQL_DATABASE = os.getenv('MYSQL_DATABASE', 'flaskappdb')
+from tools.metrics import FLASK_COLOR
 
 # Set up logging
 logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s')
