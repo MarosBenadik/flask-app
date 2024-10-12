@@ -84,7 +84,7 @@ def register_routes(app):
             cursor.close()
             connection.close()
 
-             return render_template('messages.html.html', endpoints=endpoints, messages=messages), 500
+             return render_template('messages.html', endpoints=endpoints, messages=messages), 500
         except Exception as e:
             logger.error(f"Error deleting messages: {e}")
             return render_template('500.html', endpoints=endpoints), 500
