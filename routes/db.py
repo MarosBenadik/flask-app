@@ -10,18 +10,6 @@ from tools.db_creds import MYSQL_HOST, MYSQL_PORT, MYSQL_USER, MYSQL_PASSWORD, M
 from tools.tools import get_endpoints, connect_to_database
 from tools.logger import logger
 
-def get_all_messages():
-    """Retrieve all messages from the MySQL database."""
-    if 'db' not in g:
-        g.db = connect_to_database()
-    cursor = g.db.cursor()
-    cursor.execute("SELECT * FROM messages") 
-    messages = cursor.fetchall()
-    
-    cursor.close()
-    connection.close()
-    return messages
-
 def register_routes(app):
 
     @app.route('/data')
@@ -85,14 +73,20 @@ def register_routes(app):
     @REQUEST_TIME.time()
     @REQUEST_GAUGE.track_inprogress()
     def show_messages():
-        """Endpoint to retrieve all messages and display them in a table."""
-        endpoints = get_endpoints(app)
+        """Endpoint to show all messages from the database."""
         try:
-            messages = get_all_messages()  # Retrieve messages from MySQL
-            print(f"messagess: {messages}")
-            return render_template('messages.html', messages=messages, endpoints=endpoints, color=FLASK_COLOR)
+            if 'db' not in g:
+                g.db = connect_to_database()
+            cursor = g.db.cursor()
+            cursor.execute("SELECT * FROM messages") 
+            messages = cursor.fetchall()
+            
+            cursor.close()
+            connection.close()
+
+             return render_template('messages.html.html', endpoints=endpoints, messages=messages), 500
         except Exception as e:
-            logger.error(f"Error retrieving messages: {e}")
+            logger.error(f"Error deleting messages: {e}")
             return render_template('500.html', endpoints=endpoints), 500
 
     @app.route('/messages/delete', methods=['POST'])
