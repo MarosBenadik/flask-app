@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}All Messages{% endblock %}
+
+{% block content %}
+    <h1>All Messages</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Message</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if messages %}
+                {% for message in messages %}
+                    <tr>
+                        <td>{{ message.id }}</td>
+                        <td>{{ message.content }}</td> <!-- Adjust based on your column names -->
+                        <td>{{ message.created_at }}</td> <!-- Adjust based on your column names -->
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="3">No messages found.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+{% endblock %}

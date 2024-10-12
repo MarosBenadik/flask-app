@@ -10,6 +10,18 @@ from tools.db_creds import MYSQL_HOST, MYSQL_PORT, MYSQL_USER, MYSQL_PASSWORD, M
 from tools.tools import get_endpoints, connect_to_database
 from tools.logger import logger
 
+def get_all_messages():
+    """Retrieve all messages from the MySQL database."""
+    connection = connect_to_database()
+
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM messages") 
+    messages = cursor.fetchall()
+    
+    cursor.close()
+    connection.close()
+    return messages
+
 def register_routes(app):
 
     @app.route('/data')
@@ -68,3 +80,16 @@ def register_routes(app):
             flask_env=os.getenv('FLASK_ENV', 'development'),
             node_name=os.getenv('NODE_NAME', 'unknown')
         )
+
+    @app.route('/messages', methods=['GET'])
+    @REQUEST_TIME.time()
+    @REQUEST_GAUGE.track_inprogress()
+    def show_messages():
+        """Endpoint to retrieve all messages and display them in a table."""
+        endpoints = get_endpoints(app)
+        try:
+            messages = get_all_messages()  # Retrieve messages from MySQL
+            return render_template('messages.html', messages=messages, endpoints=endpoints)
+        except Exception as e:
+            logger.error(f"Error retrieving messages: {e}")
+            return render_template('500.html', endpoints=endpoints), 500      
