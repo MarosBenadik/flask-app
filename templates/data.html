@@ -23,6 +23,7 @@
    <p>Total Users: {{ total_users }}</p>
    <p>Total Posts: {{ total_posts }}</p>
    <p>Total Comments: {{ total_comments }}</p>
+   <p>Total Messages: {{ total_messages }}</p>
    <br>
 
    <h2>Users</h2>
@@ -45,4 +46,10 @@
        <li>Comment ID: {{ comment.id }}, Content: {{ comment.content }}, Post ID: {{ comment.post_id }}, User ID: {{ comment.user_id }}</li>
    {% endfor %}
    </ul>
+   <h2>Messages</h2>
+   <ul>
+   {% for message in messages %}
+       <li>Comment ID: {{ message.id }}, Content: {{ comment.content }}, Post ID: {{ comment.created_at }}</li>
+   {% endfor %}
+   </ul> 
 {% endblock %}

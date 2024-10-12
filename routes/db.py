@@ -31,6 +31,9 @@ def register_routes(app):
         cursor.execute("SELECT COUNT(*) AS total_comments FROM comments;")
         total_comments = cursor.fetchone()['total_comments']
 
+        cursor.execute("SELECT COUNT(*) AS total_messages FROM messages;")
+        total_messages = cursor.fetchone()['total_messages']
+
         # Fetch all data from each table
         cursor.execute("SELECT * FROM users;")
         users = cursor.fetchall()
@@ -40,6 +43,9 @@ def register_routes(app):
 
         cursor.execute("SELECT * FROM comments;")
         comments = cursor.fetchall()
+
+        cursor.execute("SELECT * FROM messages;")
+        messages = cursor.fetchall()
 
         cursor.close()
 
@@ -52,9 +58,11 @@ def register_routes(app):
             total_users=total_users,
             total_posts=total_posts,
             total_comments=total_comments,
+            total_messages=total_messages,
             users=users,
             posts=posts,
             comments=comments,
+            messages=messages,
             flask_version="1.0.0",  # Example value; change as necessary
             flask_color="blue",      # Example value; change as necessary
             flask_env=os.getenv('FLASK_ENV', 'development'),
