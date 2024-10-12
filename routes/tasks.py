@@ -34,7 +34,7 @@ def register_routes(app):
 
         endpoints = get_endpoints(app)
 
-        return render_template('send_data.html', endpoints=endpoints)
+        return render_template('send_data.html', endpoints=endpoints, color=FLASK_COLOR)
 
     # Route to handle the POST request from the form
     @app.route('/task/send-data', methods=['POST'])
