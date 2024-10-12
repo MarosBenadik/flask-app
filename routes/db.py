@@ -12,9 +12,9 @@ from tools.logger import logger
 
 def get_all_messages():
     """Retrieve all messages from the MySQL database."""
-    connection = connect_to_database()
-
-    cursor = connection.cursor(dictionary=True)
+    if 'db' not in g:
+        g.db = connect_to_database()
+    cursor = g.db.cursor()
     cursor.execute("SELECT * FROM messages") 
     messages = cursor.fetchall()
     
@@ -89,7 +89,31 @@ def register_routes(app):
         endpoints = get_endpoints(app)
         try:
             messages = get_all_messages()  # Retrieve messages from MySQL
-            return render_template('messages.html', messages=messages, endpoints=endpoints)
+            print(f"messagess: {messages}")
+            return render_template('messages.html', messages=messages, endpoints=endpoints, color=FLASK_COLOR)
         except Exception as e:
             logger.error(f"Error retrieving messages: {e}")
-            return render_template('500.html', endpoints=endpoints), 500      
+            return render_template('500.html', endpoints=endpoints), 500
+
+    @app.route('/messages/delete', methods=['POST'])
+    @REQUEST_TIME.time()
+    @REQUEST_GAUGE.track_inprogress()
+    def delete_all_messages():
+        """Endpoint to delete all messages from the database."""
+        try:
+            if 'db' not in g:
+                g.db = connect_to_database()
+            cursor = g.db.cursor()
+            
+            # Delete all messages from the messages table
+            cursor.execute("DELETE FROM messages")  # Adjust the table name if necessary
+            connection.commit()
+            
+            cursor.close()
+            connection.close()
+
+            logger.info("All messages have been deleted.")
+            return redirect(f'{FLASK_COLOR}/messages')  # Redirect to the messages page
+        except Exception as e:
+            logger.error(f"Error deleting messages: {e}")
+            return render_template('500.html'), 500

@@ -44,6 +44,7 @@ def store_data_in_mysql(message):
             cursor.execute(sql_query, (message,))
         connection.commit()
         logger.info("Message stored in MySQL")
+        return True  # Indicate success
     except Exception as e:
         logger.error(f"Error while storing message in MySQL: {e}")
     finally:
