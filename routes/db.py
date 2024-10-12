@@ -82,7 +82,6 @@ def register_routes(app):
             messages = cursor.fetchall()
             
             cursor.close()
-            connection.close()
 
             endpoints = get_endpoints(app)
 
