@@ -111,7 +111,7 @@ def register_routes(app):
             endpoints = get_endpoints(app)
 
             logger.info("All messages have been deleted.")
-            return redirect(f'{FLASK_COLOR}/messages', endpoints=endpoints)  # Redirect to the messages page
+            return render_template('messagess_deleted_ok.html', endpoints=endpoints, status={"status": "Message deleted"} ), 200
         except Exception as e:
             logger.error(f"Error deleting messages: {e}")
             return render_template('500.html', endpoints=endpoints), 500
