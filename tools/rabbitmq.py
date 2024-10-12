@@ -2,6 +2,7 @@ import time, pika
 from tools.tools import connect_to_database
 from tools.logger import logger
 from tools.env_vars import FLASK_COLOR, rabbitmq_host, rabbitmq_port
+from tools.rabbit_creds import rabbitmq_user, rabbitmq_password
 
 RABBITMQ_QUEUE = f"{FLASK_COLOR}-queue"
 
@@ -10,7 +11,8 @@ def consume_and_store_data():
     """Connects to RabbitMQ, retrieves messages, and stores them in MySQL."""
     try:
         # Set up RabbitMQ connection
-        connection = pika.BlockingConnection(pika.ConnectionParameters(host=rabbitmq_host, port=rabbitmq_port))
+        credentials = pika.PlainCredentials(rabbitmq_user, rabbitmq_password)
+        connection = pika.BlockingConnection(pika.ConnectionParameters(host=rabbitmq_host, port=rabbitmq_port, credentials=credentials))
         channel = connection.channel()
         channel.queue_declare(queue=RABBITMQ_QUEUE)
 

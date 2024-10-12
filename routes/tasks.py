@@ -9,10 +9,12 @@ from tools.metrics import REQUEST_TIME, REQUEST_COUNTER, APP_INFO, REQUEST_GAUGE
 from tools.env_vars import NODE_NAME, FLASK_COLOR, FLASK_ENV, FLASK_VERSION, CROSSSERVICE_NAME, RABBITMQ_QUEUE, rabbitmq_host, rabbitmq_port
 from tools.db_creds import MYSQL_HOST, MYSQL_PORT, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE
 from tools.tools import get_endpoints, connect_to_database
+from tools.rabbit_creds import rabbitmq_user, rabbitmq_password
 
 def send_message_to_queue(message):
     logger.info("Sending ,essage to RabbitMQ")
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host=rabbitmq_host, port=rabbitmq_port))
+    credentials = pika.PlainCredentials(rabbitmq_user, rabbitmq_password)
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host=rabbitmq_host, port=rabbitmq_port, credentials=credentials))
     channel = connection.channel()
 
     # Declare a queue
