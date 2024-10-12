@@ -1,10 +1,11 @@
 from flask import Flask, send_from_directory, g
-import sys, logging
+import sys, logging, threading
 from prometheus_client import start_http_server
 from routes import register_routes
 from tools.env_vars import FLASK_COLOR
 from tools.tools import connect_to_database
 from tools.logger import logger
+from tools.rabbitmq import start_rabbitmq_consumer
 
 # Define the prefix
 PREFIX = f'/{FLASK_COLOR}'
@@ -33,7 +34,14 @@ def serve_static(path):
 register_routes(app)
 
 if __name__ == '__main__':
+
+    # Start the RabbitMQ consumer in a separate thread
+    thread = threading.Thread(target=start_rabbitmq_consumer)
+    thread.daemon = True 
+    thread.start()
+
     # Start Prometheus metrics server
-    logger.info("APP has Started")
     start_http_server(8000)
+
+    logger.info("APP has Started")
     app.run(host='0.0.0.0', port=5000, debug=True)
