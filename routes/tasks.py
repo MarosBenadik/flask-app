@@ -42,9 +42,11 @@ def register_routes(app):
     @REQUEST_GAUGE.track_inprogress()
     def send_data():
         data = request.form.get('data')  # Get data from form input
+        endpoints = get_endpoints(app)
+
         if not data:
-            return render_template('404.html', data={"error": "No data provided"}), 400
+            return render_template('404.html', endpoints=endpoints, data={"error": "No data provided"}), 400
 
         send_message_to_queue(data)
-        return render_template('send_data_ok.html', status={"status": "Message sent"}, data=data ), 200
+        return render_template('send_data_ok.html', endpoints=endpoints, status={"status": "Message sent"}, data=data ), 200
 
