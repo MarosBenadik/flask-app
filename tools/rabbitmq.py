@@ -26,10 +26,10 @@ def consume_and_store_data():
             # Insert message into MySQL
             store_data_in_mysql(message)
             # Acknowledge the message
-            ch.basic_ack(delivery_tag=method.delivery_tag)
+            channel.basic_ack(delivery_tag=method.delivery_tag)
         else:
             logger.info("No messages in the queue.")
-            
+
         # Close the connection
         connection.close()
     except Exception as e:
