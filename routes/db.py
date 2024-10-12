@@ -84,6 +84,8 @@ def register_routes(app):
             cursor.close()
             connection.close()
 
+            endpoints = get_endpoints(app)
+
             return render_template('messages.html', endpoints=endpoints, messages=messages)
             
         except Exception as e:
@@ -107,8 +109,10 @@ def register_routes(app):
             cursor.close()
             connection.close()
 
+            endpoints = get_endpoints(app)
+
             logger.info("All messages have been deleted.")
-            return redirect(f'{FLASK_COLOR}/messages')  # Redirect to the messages page
+            return redirect(f'{FLASK_COLOR}/messages', endpoints=endpoints)  # Redirect to the messages page
         except Exception as e:
             logger.error(f"Error deleting messages: {e}")
-            return render_template('500.html'), 500
+            return render_template('500.html', endpoints=endpoints), 500
