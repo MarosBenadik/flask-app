@@ -84,10 +84,10 @@ def register_routes(app):
             cursor.close()
             connection.close()
 
-             return render_template('messages.html', endpoints=endpoints, messages=messages), 200
+             return render_template('messages.html', endpoints=endpoints, messages=messages)
         except Exception as e:
             logger.error(f"Error deleting messages: {e}")
-            return render_template('500.html', endpoints=endpoints), 500
+            return render_template('500.html', endpoints=endpoints)
 
     @app.route('/messages/delete', methods=['POST'])
     @REQUEST_TIME.time()
