@@ -85,7 +85,7 @@ def register_routes(app):
 
             endpoints = get_endpoints(app)
 
-            return render_template('messages.html', endpoints=endpoints, messages=messages)
+            return render_template('messages.html', endpoints=endpoints, messages=messages, color=FLASK_COLOR)
             
         except Exception as e:
             logger.error(f"Error deleting messages: {e}")

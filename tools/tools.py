@@ -19,7 +19,7 @@ def get_endpoints(app):
 
     for rule in app.url_map.iter_rules():
         # Skip the `static` endpoint and any other endpoints with parameters
-        if rule.endpoint == 'static' or rule.arguments or rule.endpoint == 'send_data':
+        if rule.endpoint == 'static' or rule.arguments or rule.endpoint == 'send_data' or rule.endpoint == 'delete_all_meddages':
             continue
 
         try:
