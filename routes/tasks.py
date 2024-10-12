@@ -1,48 +1,48 @@
-from flask import jsonify
-import sys, os, logging
-from prometheus_client import Summary, Counter, generate_latest, Info, Gauge
+from flask import render_template, request, jsonify
+import sys, os
+from prometheus_client import Summary, Counter, Gauge
 from datetime import datetime
-import pika
+import pika, pymysql
+from tools.logger import logger
 
-from tools.metrics import REQUEST_TIME, REQUEST_COUNTER, APP_INFO, REQUEST_GAUGE, NODE_NAME, FLASK_COLOR, FLASK_ENV, FLASK_VERSION, CROSSSERVICE_NAME
-from tools.tools import get_endpoints
-
-# Set up logging
-logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s')
-logger = logging.getLogger(__name__)
-
+from tools.metrics import REQUEST_TIME, REQUEST_COUNTER, APP_INFO, REQUEST_GAUGE
+from tools.env_vars import NODE_NAME, FLASK_COLOR, FLASK_ENV, FLASK_VERSION, CROSSSERVICE_NAME, RABBITMQ_QUEUE, rabbitmq_host, rabbitmq_port
+from tools.db_creds import MYSQL_HOST, MYSQL_PORT, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE
+from tools.tools import get_endpoints, connect_to_database
 
 def send_message_to_queue(message):
-    connection = pika.BlockingConnection(pika.ConnectionParameters(rabbitmq_host))
+    logger.info("Sending ,essage to RabbitMQ")
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host=rabbitmq_host, port=rabbitmq_port))
     channel = connection.channel()
 
     # Declare a queue
-    channel.queue_declare(queue='task_queue')
+    channel.queue_declare(queue=RABBITMQ_QUEUE)
 
     # Publish the message
-    channel.basic_publish(exchange='', routing_key='task_queue', body=message)
+    channel.basic_publish(exchange='', routing_key=RABBITMQ_QUEUE, body=message)
     connection.close()
 
-# Sample data storage (in-memory)
-data_store = []
-
 def register_routes(app):
-    @app.route('/send-task', methods=['POST'])
-    def send_task():
-        task_data = request.json.get('task_data')
-        send_message_to_queue(task_data)
-        return jsonify({"status": "Task sent to RabbitMQ", "data": task_data}), 200
 
-    @app.route('/data', methods=['POST'])
-    def add_data():
-        """Endpoint to add data to the in-memory data store."""
-        new_data = request.json.get('data')
-        if new_data:
-            data_store.append(new_data)
-            return jsonify({"status": "Data added", "data": new_data}), 201
-        return jsonify({"error": "No data provided"}), 400
+    # Route to render the form to send data
+    @app.route('/task/send-data-form', methods=['GET'])
+    @REQUEST_TIME.time()
+    @REQUEST_GAUGE.track_inprogress()
+    def send_data_form():
 
-    @app.route('/data', methods=['GET'])
-    def get_data():
-        """Endpoint to retrieve all data from the in-memory data store."""
-        return jsonify({"data": data_store}), 200
+        endpoints = get_endpoints(app)
+
+        return render_template('send_data.html', endpoints=endpoints)
+
+    # Route to handle the POST request from the form
+    @app.route('/task/send-data', methods=['POST'])
+    @REQUEST_TIME.time()
+    @REQUEST_GAUGE.track_inprogress()
+    def send_data():
+        data = request.form.get('data')  # Get data from form input
+        if not data:
+            return render_template('404.html', data={"error": "No data provided"}), 400
+
+        send_message_to_queue(data)
+        return render_template('send_data_ok.html', status={"status": "Message sent"}, data=data ), 200
+

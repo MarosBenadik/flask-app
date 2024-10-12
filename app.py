@@ -2,12 +2,9 @@ from flask import Flask, send_from_directory, g
 import sys, logging
 from prometheus_client import start_http_server
 from routes import register_routes
-from tools.metrics import FLASK_COLOR
+from tools.env_vars import FLASK_COLOR
 from tools.tools import connect_to_database
-
-# Set up logging
-logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s')
-logger = logging.getLogger(__name__)
+from tools.logger import logger
 
 # Define the prefix
 PREFIX = f'/{FLASK_COLOR}'
@@ -39,4 +36,4 @@ if __name__ == '__main__':
     # Start Prometheus metrics server
     logger.info("APP has Started")
     start_http_server(8000)
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000, debug=True)

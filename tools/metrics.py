@@ -1,11 +1,6 @@
 from prometheus_client import Summary, Counter, Info, Gauge
+from tools.env_vars import NODE_NAME, FLASK_COLOR, FLASK_ENV
 import os
-
-NODE_NAME = os.getenv('NODE_NAME', 'unknown_node')
-FLASK_COLOR = os.getenv('FLASK_COLOR', 'blue')
-FLASK_ENV = os.getenv('FLASK_ENV', 'development')
-FLASK_VERSION = os.environ.get('FLASK_VERSION', 'NONE')
-CROSSSERVICE_NAME = os.environ.get('CROSSSERVICE_NAME', 'flask-blue-flaskapp-chart')  
 
 # Prometheus metrics
 REQUEST_TIME = Summary('app_processing_seconds', 'Time spent processing request')

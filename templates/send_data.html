@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Send Data{% endblock %}
+
+{% block content %}
+   <h1>Send Data to RabbitMQ</h1>
+   <p>Enter the data you want to send to RabbitMQ:</p>
+
+   <form action="{{ url_for('send_data') }}" method="POST">
+       <label for="data">Message:</label>
+       <input type="text" id="data" name="data" required>
+       <br><br>
+       <input type="submit" value="Send">
+   </form>
+
+{% endblock %}

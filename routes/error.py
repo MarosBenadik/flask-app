@@ -3,12 +3,10 @@ import sys, os, socket, logging, requests
 from prometheus_client import start_http_server, Summary, Counter, generate_latest, Info, Gauge
 from datetime import datetime
 
-from tools.metrics import REQUEST_TIME, REQUEST_COUNTER, APP_INFO, REQUEST_GAUGE, NODE_NAME, FLASK_COLOR, FLASK_ENV, FLASK_VERSION
+from tools.metrics import REQUEST_TIME, REQUEST_COUNTER, APP_INFO, REQUEST_GAUGE
+from tools.env_vars import NODE_NAME, FLASK_COLOR, FLASK_ENV, FLASK_VERSION
 from tools.tools import get_endpoints
-
-# Set up logging
-logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s')
-logger = logging.getLogger(__name__)
+from tools.logger import logger
 
 def register_routes(app):
 
@@ -21,7 +19,7 @@ def register_routes(app):
         
         endpoints = get_endpoints(app)
 
-        return render_template('404.html', endpoints=endpoints), 404
+        return render_template('404.html', endpoints=endpoints, color=FLASK_COLOR), 404
 
 
     @app.errorhandler(500)
@@ -33,4 +31,4 @@ def register_routes(app):
         
         endpoints = get_endpoints(app)
 
-        return render_template('500.html', endpoints=endpoints), 500
+        return render_template('500.html', endpoints=endpoints, color=FLASK_COLOR ), 500

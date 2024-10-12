@@ -4,7 +4,8 @@ from prometheus_client import start_http_server, Summary, Counter, generate_late
 from datetime import datetime
 import pymysql
 
-from tools.metrics import REQUEST_TIME, REQUEST_COUNTER, APP_INFO, REQUEST_GAUGE, NODE_NAME, FLASK_COLOR, FLASK_ENV, FLASK_VERSION, CROSSSERVICE_NAME
+from tools.metrics import REQUEST_TIME, REQUEST_COUNTER, APP_INFO
+from tools.env_vars import NODE_NAME, FLASK_COLOR, FLASK_ENV, FLASK_VERSION, CROSSSERVICE_NAME
 from tools.db_creds import MYSQL_HOST, MYSQL_PORT, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE
 
 # Set up logging
@@ -18,7 +19,7 @@ def get_endpoints(app):
 
     for rule in app.url_map.iter_rules():
         # Skip the `static` endpoint and any other endpoints with parameters
-        if rule.endpoint == 'static' or rule.arguments:
+        if rule.endpoint == 'static' or rule.arguments or rule.endpoint == 'send_data':
             continue
 
         try:

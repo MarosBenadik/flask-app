@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Send Data{% endblock %}
+
+{% block content %}
+    <h1>Data Has been Sent to RabbitMQ</h1>
+    <p>Status: {{ status.status }}</p>
+
+    <h2>Data:</h2>
+    <ul>
+        {% for item in data %}
+            <li>{{ item }}</li>
+        {% else %}
+            <li>No data available</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
