@@ -36,12 +36,12 @@ register_routes(app)
 if __name__ == '__main__':
 
     # Start the RabbitMQ consumer in a separate thread
-    thread = threading.Thread(target=start_rabbitmq_consumer)
-    thread.daemon = True 
-    thread.start()
+    #thread = threading.Thread(target=start_rabbitmq_consumer)
+    #thread.daemon = True 
+    #thread.start()
 
     # Start Prometheus metrics server
-    start_http_server(8001)
+    start_http_server(8111)
 
     logger.info("APP has Started")
     app.run(host='0.0.0.0', port=5000, debug=True)
