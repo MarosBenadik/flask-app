@@ -96,6 +96,7 @@ def register_routes(app):
     @REQUEST_GAUGE.track_inprogress()
     def delete_all_messages():
         """Endpoint to delete all messages from the database."""
+        endpoints = get_endpoints(app)
         try:
             if 'db' not in g:
                 g.db = connect_to_database()
@@ -106,8 +107,6 @@ def register_routes(app):
             cursor.commit()
             
             cursor.close()
-
-            endpoints = get_endpoints(app)
 
             logger.info("All messages have been deleted.")
             return render_template('messagess_deleted_ok.html', endpoints=endpoints, status={"status": "Message deleted"} ), 200
