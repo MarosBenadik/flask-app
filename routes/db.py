@@ -103,10 +103,9 @@ def register_routes(app):
             
             # Delete all messages from the messages table
             cursor.execute("DELETE FROM messages")  # Adjust the table name if necessary
-            connection.commit()
+            cursor.commit()
             
             cursor.close()
-            connection.close()
 
             endpoints = get_endpoints(app)
 
