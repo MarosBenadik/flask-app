@@ -19,6 +19,8 @@ def consume_and_store_data():
         # Try to retrieve messages
         method_frame, header_frame, body = channel.basic_get(queue=RABBITMQ_QUEUE)
 
+        logger.info(f"RABBIT BODY: {body.decode('utf-8')}, method_frame: {method_frame}, header_frame: {header_frame}")
+
         # Callback function to process each message
         if method_frame:
             message = body.decode('utf-8')
@@ -26,7 +28,7 @@ def consume_and_store_data():
             # Insert message into MySQL
             store_data_in_mysql(message)
             # Acknowledge the message
-            channel.basic_ack(delivery_tag=method.delivery_tag)
+            channel.basic_ack(delivery_tag=method_frame.delivery_tag)
         else:
             logger.info("No messages in the queue.")
 
