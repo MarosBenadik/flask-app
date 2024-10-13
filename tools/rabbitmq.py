@@ -19,8 +19,6 @@ def consume_and_store_data():
         # Try to retrieve messages
         method_frame, header_frame, body = channel.basic_get(queue=RABBITMQ_QUEUE)
 
-        logger.info(f"RABBIT BODY: {body.decode('utf-8')}, method_frame: {method_frame}, header_frame: {header_frame}")
-
         # Callback function to process each message
         if method_frame:
             message = body.decode('utf-8')

@@ -8,10 +8,10 @@
 
     <h2>Data:</h2>
     <ul>
-        {% for item in data %}
-            <li>{{ item }}</li>
+        {% if data %}
+            <li>Message: {{ data }}</li>
         {% else %}
             <li>No data available</li>
-        {% endfor %}
+        {% endif %}
     </ul>
 {% endblock %}
