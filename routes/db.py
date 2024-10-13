@@ -105,7 +105,7 @@ def register_routes(app):
             
             # Delete all messages from the messages table
             cursor.execute("DELETE FROM messages")     
-            g.db.commit()         
+            cursor.commit()         
             cursor.close()
 
             logger.info("All messages have been deleted.")
