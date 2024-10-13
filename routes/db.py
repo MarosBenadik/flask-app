@@ -97,15 +97,14 @@ def register_routes(app):
     def delete_all_messages():
         """Endpoint to delete all messages from the database."""
         endpoints = get_endpoints(app)
+
         try:
             if 'db' not in g:
                 g.db = connect_to_database()
             cursor = g.db.cursor()
             
             # Delete all messages from the messages table
-            cursor.execute("DELETE FROM messages")  # Adjust the table name if necessary
-            cursor.commit()
-            
+            cursor.execute("DELETE FROM messages")              
             cursor.close()
 
             logger.info("All messages have been deleted.")
