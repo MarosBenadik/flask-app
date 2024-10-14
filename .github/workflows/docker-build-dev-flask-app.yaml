@@ -34,11 +34,8 @@ jobs:
         # Read the current version using yq
         VERSION=$(yq eval '.app.version' version.yaml | tr -d '"')
         IFS='.' read -r major minor patch <<< "$VERSION"
-
-        # Convert to integers 
-        major=$((major + 0))
-        minor=$((minor + 0))
-        patch=$((patch + 0))
+        
+        echo "$major . $minor . $patch"
 
         # Bump the version
         if [[ "$patch" -eq 9 ]]; then
