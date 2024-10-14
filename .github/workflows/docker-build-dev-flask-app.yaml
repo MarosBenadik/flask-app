@@ -44,7 +44,8 @@ jobs:
             else
               $major + "." + $minor + "." + ($patch | tonumber + 1 | tostring)
             end
-          ))' -i flask-helm/values.yaml
+          ) | join(".")
+          )' -i flask-helm/values.yaml
         echo "New Version: $( yq '.app.version' flask-helm/values.yaml ) "
     - name: commit version bump
       run: |
