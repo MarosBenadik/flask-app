@@ -41,7 +41,7 @@ if __name__ == '__main__':
     thread.start()
 
     # Start Prometheus metrics server
-    start_http_server(8111)
+    start_http_server(8000)
 
     logger.info("APP has Started")
     app.run(host='0.0.0.0', port=5000)
