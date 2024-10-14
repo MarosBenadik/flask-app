@@ -27,7 +27,7 @@ jobs:
       run: docker push mbenadik/flaskapp:latest
     - name: Pull helm Chart
       run: |
-        git clone https://github.com/MarosBenadik/flask-helm.git
+        git clone -b dev https://github.com/MarosBenadik/flask-helm.git
     - name: bump version
       run: |
         echo "Old Version: $( yq '.app.version' flask-helm/values.yaml ) "
