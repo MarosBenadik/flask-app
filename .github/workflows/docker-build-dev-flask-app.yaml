@@ -32,7 +32,7 @@ jobs:
       run: |
         echo "Old Version: $( yq '.app.version' flask-helm/values.yaml ) "
         # Read the current version using yq
-        VERSION=$(yq eval '.app.version' flask-helm/version.yaml | tr -d '"')
+        VERSION=$(yq eval '.app.version' flask-helm/values.yaml | tr -d '"')
         IFS='.' read -r major minor patch <<< "$VERSION"
         
         echo "$major . $minor . $patch"
@@ -52,7 +52,7 @@ jobs:
         NEW_VERSION="$major.$minor.$patch"
 
         # Update the version in the YAML file using yq
-        yq eval -i ".app.version = \"$NEW_VERSION\"" flask-helm/version.yaml
+        yq eval -i ".app.version = \"$NEW_VERSION\"" flask-helm/values.yaml
         
         # Output the new version
         echo "New Version: $( yq '.app.version' flask-helm/values.yaml ) "
