@@ -3,7 +3,8 @@ from .error import register_routes as register_error_routes
 from .health import register_routes as register_health_routes
 from .db import register_routes as register_db_routes
 from .crossservice import register_routes as register_crossservice_routes
-from .tasks import register_routes as register_task_routes 
+from .tasks import register_routes as register_task_routes
+from .vault import register_routes as register_vault_routes 
 
 def register_routes(app):
     register_main_routes(app)
@@ -12,3 +13,4 @@ def register_routes(app):
     register_db_routes(app)
     register_crossservice_routes(app)
     register_task_routes(app)
+    register_vault_routes(app)
