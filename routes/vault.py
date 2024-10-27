@@ -16,9 +16,11 @@ def register_routes(app):
     @REQUEST_GAUGE.track_inprogress()
     def secret():
         logger.info("Secret route accessed")
+
         REQUEST_COUNTER.labels(http_method='POST', url_path='/secret', status_code='200').inc()
         endpoints = get_endpoints(app)
 
         secret = get_vault_secret('secret/flask/testsecret')
+        logger.info(f"Secret retrieved: {secret}")
 
         return render_template('secret.html', endpoints=endpoints, secret=secret )
