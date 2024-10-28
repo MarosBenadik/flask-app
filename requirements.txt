@@ -6,3 +6,4 @@ requests
 pika
 celery
 hvac
+rocketchat_API

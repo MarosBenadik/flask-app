@@ -10,7 +10,6 @@ from tools.tools import get_endpoints
 from tools.vault import get_vault_secret
 from tools.image_render import get_image_url
 
-
 VAULT_PATH = os.getenv('VAULT_PATH', 'default')
 
 def register_routes(app):

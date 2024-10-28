@@ -35,7 +35,7 @@ def consume_and_store_data():
     except Exception as e:
         logger.error(f"Error while polling RabbitMQ: {e}")
 
-def store_data_in_mysql(message):
+def store_data_in_mysql(message: str):
     """Store the consumed message in the MySQL database."""
     try:
         connection = connect_to_database()
