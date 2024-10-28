@@ -9,6 +9,8 @@ from tools.logger import logger
 from tools.tools import get_endpoints
 from tools.vault import get_vault_secret
 
+VAULT_PATH = os.getenv('VAULT_PATH', 'default')
+
 def register_routes(app):
 
     @app.route('/secret')
@@ -20,7 +22,7 @@ def register_routes(app):
         REQUEST_COUNTER.labels(http_method='POST', url_path='/secret', status_code='200').inc()
         endpoints = get_endpoints(app)
 
-        secret = get_vault_secret('secret/flask/testsecret')
+        secret = get_vault_secret(VAULT_PATH)
         logger.info(f"Secret retrieved: {secret}")
 
         return render_template('secret.html', endpoints=endpoints, secret=secret )
