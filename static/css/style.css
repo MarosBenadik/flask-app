@@ -1,7 +1,7 @@
-/* Global reset and styles */
+/* Existing styles */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #f5f7fa, #c3cfe2); /* Light gradient background */
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -11,107 +11,97 @@ body {
 
 .container {
     text-align: center;
-    background: #ffffff;
+    background: white;
     padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-    max-width: 600px;
-    width: 90%;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
 h1 {
-    color: #222;
-    font-size: 2rem;
-    margin-bottom: 0.75rem;
+    color: #333;
+    margin-bottom: 1rem;
 }
 
 p {
-    color: #555;
-    margin-bottom: 1.25rem;
-    line-height: 1.6;
+    color: #666;
+    margin-bottom: 1rem;
 }
 
 a {
     display: inline-block;
-    padding: 0.6rem 1.2rem;
+    padding: 0.5rem 1rem;
     text-decoration: none;
     color: white;
-    background: linear-gradient(135deg, #007bff, #0056b3);
-    border-radius: 6px;
-    transition: background 0.3s, transform 0.2s;
+    background-color: #007bff;
+    border-radius: 4px;
+    margin: 5px 0; /* Add margin for spacing between buttons */
+    text-align: center; /* Center text in buttons */
+    font-weight: bold; /* Make text bold */
 }
 
 a:hover {
-    background: linear-gradient(135deg, #0056b3, #003a75);
-    transform: translateY(-2px);
+    background-color: #0056b3;
 }
 
 /* Sidebar styles */
 .sidebar {
-    width: 260px;
+    width: 250px;
     position: fixed;
     top: 0;
     left: 0;
     height: 100%;
-    background: #222;
-    color: #eee;
-    padding: 1.5rem;
-    box-shadow: 3px 0 8px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease;
+    background-color: #333;
+    color: white;
+    padding: 1rem;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column; /* Align items in a column */
+    align-items: center; /* Center items horizontally */
 }
 
 .sidebar h2 {
-    font-size: 1.5rem;
     margin-top: 0;
-    color: #ffffff;
 }
 
 .sidebar ul {
-    list-style: none;
+    list-style-type: none;
     padding: 0;
+    width: 100%; /* Make the list take full width for centering */
 }
 
 .sidebar ul li {
-    margin-bottom: 0.8rem;
+    margin-bottom: 0.5rem;
+    width: 100%; /* Ensure list items take full width */
 }
 
 .sidebar ul li a {
-    color: #ddd;
-    font-size: 1rem;
+    color: white;
     text-decoration: none;
-    padding: 0.5rem 0;
-    display: block;
-    transition: color 0.3s, padding-left 0.3s;
+    width: 100%; /* Make the anchor take full width */
+    text-align: center; /* Center text in links */
+    font-weight: bold; /* Make text bold */
 }
 
 .sidebar ul li a:hover {
-    color: #ffffff;
-    padding-left: 0.5rem;
+    text-decoration: underline;
 }
 
 .main-content {
-    margin-left: 270px;
-    padding: 2rem;
-    width: calc(100% - 270px);
+    margin-left: 260px; /* Adjust to match sidebar width + padding */
+    padding: 1rem;
+    width: calc(100% - 260px);
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
     .sidebar {
         width: 100%;
         height: auto;
         position: relative;
-        transform: translateX(-100%);
         box-shadow: none;
     }
 
     .main-content {
         margin-left: 0;
         width: 100%;
-        padding: 1rem;
-    }
-
-    .container {
-        max-width: 90%;
     }
 }
