@@ -34,6 +34,9 @@ a {
     color: white;
     background-color: #007bff;
     border-radius: 4px;
+    margin: 5px 0; /* Add margin for spacing between buttons */
+    text-align: center; /* Center text in buttons */
+    font-weight: bold; /* Make text bold */
 }
 
 a:hover {
@@ -51,6 +54,9 @@ a:hover {
     color: white;
     padding: 1rem;
     box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column; /* Align items in a column */
+    align-items: center; /* Center items horizontally */
 }
 
 .sidebar h2 {
@@ -60,15 +66,20 @@ a:hover {
 .sidebar ul {
     list-style-type: none;
     padding: 0;
+    width: 100%; /* Make the list take full width for centering */
 }
 
 .sidebar ul li {
     margin-bottom: 0.5rem;
+    width: 100%; /* Ensure list items take full width */
 }
 
 .sidebar ul li a {
     color: white;
     text-decoration: none;
+    width: 100%; /* Make the anchor take full width */
+    text-align: center; /* Center text in links */
+    font-weight: bold; /* Make text bold */
 }
 
 .sidebar ul li a:hover {
@@ -93,5 +104,23 @@ a:hover {
         margin-left: 0;
         width: 100%;
     }
+}
+
+/* Logo styles */
+.logo {
+    display: flex;
+    align-items: center; /* Align logo and text vertically */
+    margin-bottom: 1rem; /* Add some space below the logo */
+}
+
+.logo img {
+    height: 50px; /* Adjust the height of the logo as needed */
+    margin-right: 10px; /* Space between logo and text */
+}
+
+.logo h1 {
+    font-size: 24px; /* Adjust font size as needed */
+    color: white; /* Change text color to white */
+    margin: 0; /* Remove default margin */
 }
 

@@ -7,6 +7,7 @@ from tools.metrics import REQUEST_TIME, REQUEST_COUNTER, APP_INFO, REQUEST_GAUGE
 from tools.env_vars import NODE_NAME, FLASK_COLOR, FLASK_ENV, FLASK_VERSION, CROSSSERVICE_NAME 
 from tools.tools import get_endpoints
 from tools.logger import logger
+from tools.image_render import get_image_url
 
 def register_routes(app):
 
@@ -36,6 +37,7 @@ def register_routes(app):
         logger.info("CrossService route accessed")
         REQUEST_COUNTER.labels(http_method='GET', url_path='/crossservice', status_code='200').inc()
 
+        logo = get_image_url('flask-app', 'mb.jpg')
         endpoints = get_endpoints(app)
 
         logger.info(f"endpoints: {endpoints}")
@@ -52,5 +54,5 @@ def register_routes(app):
             response_data = "Invalid JSON response"
 
         logger.info(f"response: {response_data}")
-        return render_template('crossservice.html', response=response_data, endpoints=endpoints, crossservice=CROSSSERVICE_NAME)
+        return render_template('crossservice.html', response=response_data, logo=logo, endpoints=endpoints, crossservice=CROSSSERVICE_NAME)
 

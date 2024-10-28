@@ -10,6 +10,8 @@ from tools.env_vars import NODE_NAME, FLASK_COLOR, FLASK_ENV, FLASK_VERSION, CRO
 from tools.db_creds import MYSQL_HOST, MYSQL_PORT, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE
 from tools.tools import get_endpoints, connect_to_database
 from tools.rabbit_creds import rabbitmq_user, rabbitmq_password
+from tools.image_render import get_image_url
+
 
 def send_message_to_queue(message):
     logger.info("Sending ,essage to RabbitMQ")
@@ -31,22 +33,25 @@ def register_routes(app):
     @REQUEST_TIME.time()
     @REQUEST_GAUGE.track_inprogress()
     def send_data_form():
-
+        
+        logo = get_image_url('flask-app', 'mb.jpg')
         endpoints = get_endpoints(app)
 
-        return render_template('send_data.html', endpoints=endpoints, color=FLASK_COLOR)
+        return render_template('send_data.html', endpoints=endpoints, logo=logo, color=FLASK_COLOR)
 
     # Route to handle the POST request from the form
     @app.route('/task/send-data', methods=['POST'])
     @REQUEST_TIME.time()
     @REQUEST_GAUGE.track_inprogress()
     def send_data():
-        data = request.form.get('data')  # Get data from form input
+        data = request.form.get('data')
+
+        logo = get_image_url('flask-app', 'mb.jpg')
         endpoints = get_endpoints(app)
 
         if not data:
-            return render_template('404.html', endpoints=endpoints, data={"error": "No data provided"}), 400
+            return render_template('404.html', endpoints=endpoints, logo=logo, data={"error": "No data provided"}), 400
 
         send_message_to_queue(data)
-        return render_template('send_data_ok.html', endpoints=endpoints, status={"status": "Message sent"}, data=data ), 200
+        return render_template('send_data_ok.html', endpoints=endpoints, logo=logo, status={"status": "Message sent"}, data=data ), 200
 

@@ -8,6 +8,7 @@ from tools.env_vars import NODE_NAME, FLASK_COLOR, FLASK_ENV, FLASK_VERSION
 from tools.db_creds import MYSQL_HOST, MYSQL_PORT, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE
 from tools.tools import get_endpoints, connect_to_database
 from tools.logger import logger
+from tools.image_render import get_image_url
 
 def register_routes(app):
 
@@ -25,10 +26,11 @@ def register_routes(app):
         db_status = cursor.execute("SELECT 'Hello, MySQL!' AS message")
         cursor.close()
         #db_status = False
-
+        
+        logo = get_image_url('flask-app', 'mb.jpg')
         endpoints = get_endpoints(app)
 
-        return render_template('index.html', endpoints=endpoints, flask_env=FLASK_ENV, flask_color=FLASK_COLOR, node_name=NODE_NAME, flask_version=FLASK_VERSION, db_status=db_status)
+        return render_template('index.html', endpoints=endpoints, flask_env=FLASK_ENV, flask_color=FLASK_COLOR, node_name=NODE_NAME, flask_version=FLASK_VERSION, db_status=db_status, logo=logo)
 
 
     @app.route('/info')
@@ -42,6 +44,8 @@ def register_routes(app):
         current_time = datetime.now().strftime('%H:%M:%S')
         current_date = datetime.now().strftime('%Y-%m-%d')
 
+
+        logo = get_image_url('flask-app', 'mb.jpg')
         endpoints = get_endpoints(app)
 
         data = {
@@ -50,7 +54,7 @@ def register_routes(app):
             'pod_name': pod_name,
             'ip_address': ip_address
         }
-        return render_template('info.html', data=data, endpoints=endpoints)
+        return render_template('info.html', data=data, endpoints=endpoints, logo=logo)
 
     @app.route('/endpoints')
     @REQUEST_TIME.time()
@@ -59,15 +63,17 @@ def register_routes(app):
         logger.info("Endpoints route accessed")
         REQUEST_COUNTER.labels(http_method='GET', url_path='/endpoints', status_code='200').inc()
         
+        logo = get_image_url('flask-app', 'mb.jpg')
         endpoints = get_endpoints(app)
 
-        return render_template('endpoints.html', endpoints=endpoints)
+        return render_template('endpoints.html', endpoints=endpoints, logo=logo)
 
     @app.route('/help')
     @REQUEST_TIME.time()
     @REQUEST_GAUGE.track_inprogress()
     def help():
         logger.info("Help route accessed")
+        logo = get_image_url('flask-app', 'mb.jpg')
         endpoints = get_endpoints(app)
         REQUEST_COUNTER.labels(http_method='GET', url_path='/help', status_code='200').inc()
 
@@ -81,4 +87,4 @@ def register_routes(app):
             '/endpoints': 'List all available endpoints dynamically',
             '/static/<path:path>': 'Serve static files'
         }
-        return render_template('help.html', help_info=help_info, endpoints=endpoints)
+        return render_template('help.html', help_info=help_info, endpoints=endpoints, logo=logo)
