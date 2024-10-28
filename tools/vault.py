@@ -14,10 +14,12 @@ def read_vault_token():
         return None
 
 def get_vault_secret(secret_name):
+    logger.info(f"Vault Host: {VAULT_HOST}" )
     client = hvac.Client(url=VAULT_HOST)
-    
     client.token = read_vault_token()
+
     logger.info(f"get_vault_secret accessed")
     secret = client.secrets.kv.v2.read_secret(path=secret_name)
     logger.info(f"get_vault_secret accessed: {secret}")
+    
     return secret
