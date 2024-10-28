@@ -9,6 +9,7 @@ from tools.env_vars import NODE_NAME, FLASK_COLOR, FLASK_ENV, FLASK_VERSION, CRO
 from tools.db_creds import MYSQL_HOST, MYSQL_PORT, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE
 from tools.tools import get_endpoints, connect_to_database
 from tools.logger import logger
+from tools.image_render import get_image_url
 
 def register_routes(app):
 
@@ -49,6 +50,7 @@ def register_routes(app):
 
         cursor.close()
 
+        logo = get_image_url('flask-app', 'bWIuanBn')
         endpoints = get_endpoints(app)
 
         # Render the template with the data
@@ -61,6 +63,7 @@ def register_routes(app):
             total_messages=total_messages,
             users=users,
             posts=posts,
+            logo=logo,
             comments=comments,
             messages=messages,
             flask_version="1.0.0",  # Example value; change as necessary
@@ -83,9 +86,10 @@ def register_routes(app):
             
             cursor.close()
 
+            logo = get_image_url('flask-app', 'bWIuanBn')
             endpoints = get_endpoints(app)
 
-            return render_template('messages.html', endpoints=endpoints, messages=messages, color=FLASK_COLOR)
+            return render_template('messages.html', endpoints=endpoints, logo=logo, messages=messages, color=FLASK_COLOR)
             
         except Exception as e:
             logger.error(f"Error deleting messages: {e}")
@@ -96,6 +100,7 @@ def register_routes(app):
     @REQUEST_GAUGE.track_inprogress()
     def delete_all_messages():
         """Endpoint to delete all messages from the database."""
+        logo = get_image_url('flask-app', 'bWIuanBn')
         endpoints = get_endpoints(app)
 
         try:
@@ -109,7 +114,7 @@ def register_routes(app):
             cursor.close()
 
             logger.info("All messages have been deleted.")
-            return render_template('messagess_deleted_ok.html', endpoints=endpoints, status={"status": "Message deleted"} ), 200
+            return render_template('messagess_deleted_ok.html', endpoints=endpoints, logo=logo, status={"status": "Message deleted"} ), 200
         except Exception as e:
             logger.error(f"Error deleting messages: {e}")
             return render_template('500.html', endpoints=endpoints), 500

@@ -8,6 +8,8 @@ from tools.env_vars import NODE_NAME, FLASK_COLOR, FLASK_ENV, FLASK_VERSION
 from tools.logger import logger
 from tools.tools import get_endpoints
 from tools.vault import get_vault_secret
+from tools.image_render import get_image_url
+
 
 VAULT_PATH = os.getenv('VAULT_PATH', 'default')
 
@@ -20,9 +22,11 @@ def register_routes(app):
         logger.info("Secret route accessed")
 
         REQUEST_COUNTER.labels(http_method='POST', url_path='/secret', status_code='200').inc()
+
+        logo = get_image_url('flask-app', 'bWIuanBn')
         endpoints = get_endpoints(app)
 
         secret = get_vault_secret(VAULT_PATH)
         logger.info(f"Secret retrieved: {secret}")
 
-        return render_template('secret.html', endpoints=endpoints, secret=secret )
+        return render_template('secret.html', endpoints=endpoints, logo=logo, secret=secret )
