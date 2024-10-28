@@ -1,4 +1,4 @@
-from flask import jsonify
+from flask import render_template
 import sys, os, logging
 from prometheus_client import Summary, Counter, generate_latest, Info, Gauge
 from datetime import datetime
