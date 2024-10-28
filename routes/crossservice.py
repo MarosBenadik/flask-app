@@ -37,7 +37,7 @@ def register_routes(app):
         logger.info("CrossService route accessed")
         REQUEST_COUNTER.labels(http_method='GET', url_path='/crossservice', status_code='200').inc()
 
-        logo = get_image_url('flask-app', 'bWIuanBn')
+        logo = get_image_url('flask-app', 'mb.jpg')
         endpoints = get_endpoints(app)
 
         logger.info(f"endpoints: {endpoints}")

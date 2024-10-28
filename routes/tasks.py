@@ -34,7 +34,7 @@ def register_routes(app):
     @REQUEST_GAUGE.track_inprogress()
     def send_data_form():
         
-        logo = get_image_url('flask-app', 'bWIuanBn')
+        logo = get_image_url('flask-app', 'mb.jpg')
         endpoints = get_endpoints(app)
 
         return render_template('send_data.html', endpoints=endpoints, logo=logo, color=FLASK_COLOR)
@@ -46,7 +46,7 @@ def register_routes(app):
     def send_data():
         data = request.form.get('data')
 
-        logo = get_image_url('flask-app', 'bWIuanBn')
+        logo = get_image_url('flask-app', 'mb.jpg')
         endpoints = get_endpoints(app)
 
         if not data:

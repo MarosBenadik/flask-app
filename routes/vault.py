@@ -23,7 +23,7 @@ def register_routes(app):
 
         REQUEST_COUNTER.labels(http_method='POST', url_path='/secret', status_code='200').inc()
 
-        logo = get_image_url('flask-app', 'bWIuanBn')
+        logo = get_image_url('flask-app', 'mb.jpg')
         endpoints = get_endpoints(app)
 
         secret = get_vault_secret(VAULT_PATH)

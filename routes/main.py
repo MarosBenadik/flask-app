@@ -27,7 +27,7 @@ def register_routes(app):
         cursor.close()
         #db_status = False
         
-        logo = get_image_url('flask-app', 'bWIuanBn')
+        logo = get_image_url('flask-app', 'mb.jpg')
         endpoints = get_endpoints(app)
 
         return render_template('index.html', endpoints=endpoints, flask_env=FLASK_ENV, flask_color=FLASK_COLOR, node_name=NODE_NAME, flask_version=FLASK_VERSION, db_status=db_status, logo=logo)
@@ -45,7 +45,7 @@ def register_routes(app):
         current_date = datetime.now().strftime('%Y-%m-%d')
 
 
-        logo = get_image_url('flask-app', 'bWIuanBn')
+        logo = get_image_url('flask-app', 'mb.jpg')
         endpoints = get_endpoints(app)
 
         data = {
@@ -63,7 +63,7 @@ def register_routes(app):
         logger.info("Endpoints route accessed")
         REQUEST_COUNTER.labels(http_method='GET', url_path='/endpoints', status_code='200').inc()
         
-        logo = get_image_url('flask-app', 'bWIuanBn')
+        logo = get_image_url('flask-app', 'mb.jpg')
         endpoints = get_endpoints(app)
 
         return render_template('endpoints.html', endpoints=endpoints, logo=logo)
@@ -73,7 +73,7 @@ def register_routes(app):
     @REQUEST_GAUGE.track_inprogress()
     def help():
         logger.info("Help route accessed")
-        logo = get_image_url('flask-app', 'bWIuanBn')
+        logo = get_image_url('flask-app', 'mb.jpg')
         endpoints = get_endpoints(app)
         REQUEST_COUNTER.labels(http_method='GET', url_path='/help', status_code='200').inc()
 

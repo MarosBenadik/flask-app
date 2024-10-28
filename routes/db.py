@@ -50,7 +50,7 @@ def register_routes(app):
 
         cursor.close()
 
-        logo = get_image_url('flask-app', 'bWIuanBn')
+        logo = get_image_url('flask-app', 'mb.jpg')
         endpoints = get_endpoints(app)
 
         # Render the template with the data
@@ -86,7 +86,7 @@ def register_routes(app):
             
             cursor.close()
 
-            logo = get_image_url('flask-app', 'bWIuanBn')
+            logo = get_image_url('flask-app', 'mb.jpg')
             endpoints = get_endpoints(app)
 
             return render_template('messages.html', endpoints=endpoints, logo=logo, messages=messages, color=FLASK_COLOR)
@@ -100,7 +100,7 @@ def register_routes(app):
     @REQUEST_GAUGE.track_inprogress()
     def delete_all_messages():
         """Endpoint to delete all messages from the database."""
-        logo = get_image_url('flask-app', 'bWIuanBn')
+        logo = get_image_url('flask-app', 'mb.jpg')
         endpoints = get_endpoints(app)
 
         try:

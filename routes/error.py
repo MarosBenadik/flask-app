@@ -19,7 +19,7 @@ def register_routes(app):
         logger.error(f"Page not found: {e}")
         REQUEST_COUNTER.labels(http_method='GET', url_path='/404', status_code='404').inc()
         
-        logo = get_image_url('flask-app', 'bWIuanBn')
+        logo = get_image_url('flask-app', 'mb.jpg')
         endpoints = get_endpoints(app)
 
         return render_template('404.html', endpoints=endpoints, logo=logo, color=FLASK_COLOR), 404
@@ -32,7 +32,7 @@ def register_routes(app):
         logger.error(f"Server error: {e}")
         REQUEST_COUNTER.labels(http_method='GET', url_path='/500', status_code='500').inc()
         
-        logo = get_image_url('flask-app', 'bWIuanBn')
+        logo = get_image_url('flask-app', 'mb.jpg')
         endpoints = get_endpoints(app)
 
         return render_template('500.html', endpoints=endpoints, logo=logo, color=FLASK_COLOR ), 500
