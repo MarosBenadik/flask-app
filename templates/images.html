@@ -3,26 +3,29 @@
 {% block title %}Send Data{% endblock %}
 
 {% block content %}
-    <h1>Images Has been retrieved!</h1>
+    <h1>Images Have Been Retrieved!</h1>
     <p>Status: OK</p>
 
     <h2>Images:</h2>
-    <ul>
+    <div>
         {% if objects %}
-            {% for object in objects %}
-                <br>
-                <tr>
-                    <td>IMAGE: {{ object._object_name }}</td>
-                    <td>BUCKET: {{ object._bucket_name }}</td>
-                    <td>BUCKET: {{ object._bucket_name }}</td>
-                    <img src="http://192.168.56.105:32223/{{ object._bucket_name }}/{{ object._object_name }}" alt="{{ object._object_name }}">
-                </tr>
-                <br>
-            {% endfor %}
+            <ul style="list-style-type: none; padding: 0;">
+                {% for object in objects %}
+                    <li style="display: flex; align-items: center; margin-bottom: 10px;">
+                        <a href="http://192.168.56.105:32223/{{ object._bucket_name }}/{{ object._object_name }}" target="_blank">
+                            <img src="http://192.168.56.105:32223/{{ object._bucket_name }}/{{ object._object_name }}" 
+                                 alt="{{ object._object_name }}" 
+                                 style="width: 4cm; height: 4cm; margin-right: 10px;">
+                        </a>
+                        <div>
+                            <strong>IMAGE:</strong> {{ object._object_name }} <br>
+                            <strong>BUCKET:</strong> {{ object._bucket_name }} <br>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
         {% else %}
-            <tr>
-                <td colspan="3">No object found.</td>
-            </tr>
+            <p>No objects found.</p>
         {% endif %}
-    </ul>
+    </div>
 {% endblock %}
