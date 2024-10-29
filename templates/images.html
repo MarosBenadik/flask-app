@@ -6,13 +6,18 @@
     <h1>Images Has been retrieved!</h1>
     <p>Status: OK</p>
 
-    <h2>Data:</h2>
+    <h2>Images:</h2>
     <ul>
         {% if objects %}
             {% for object in objects %}
+                <br>
                 <tr>
-                    <td>{{ object }}</td>
+                    <td>IMAGE: {{ object._object_name }}</td>
+                    <td>BUCKET: {{ object._bucket_name }}</td>
+                    <td>BUCKET: {{ object._bucket_name }}</td>
+                    <img src="http://192.168.56.105:32223/{{ object._bucket_name }}/{{ object._object_name }}" alt="{{ object._object_name }}">
                 </tr>
+                <br>
             {% endfor %}
         {% else %}
             <tr>

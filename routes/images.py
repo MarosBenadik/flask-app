@@ -35,7 +35,7 @@ def register_routes(app):
                 list_of_images.append(obj.__dict__)
         except Exception as err:
             err = { str(err), 500 }
-
+        logger.info(f"Images List: {list_of_images}")
         return render_template('images.html', endpoints=endpoints, logo=logo, objects=list_of_images )
 
         

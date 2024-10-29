@@ -13,9 +13,6 @@ access_key = secret['data']['data']['access_key']
 secret_key = secret['data']['data']['secret_key']
 
 def get_minio_client():
-    logger.info(f"Getting minio secret: {secret}")
-    logger.info(f"Getting minio access_key: {access_key}")
-    logger.info(f"Getting minio secret_key: {secret_key}")
     if 'minio' not in g:
         # Initialize MinIO client with your app configuration
         g.minio = Minio(
