@@ -7,24 +7,33 @@ from tools.metrics import REQUEST_TIME, REQUEST_COUNTER, APP_INFO, REQUEST_GAUGE
 from tools.env_vars import NODE_NAME, FLASK_COLOR, FLASK_ENV, FLASK_VERSION
 from tools.logger import logger
 from tools.tools import get_endpoints
-from tools.vault import get_vault_secret
 from tools.image_render import get_image_url
+from tools.image_management.py import get_minio_client
 
-VAULT_PATH = os.getenv('VAULT_PATH', 'default')
+MINIO_BUCKET = os.getenv('MINIO_BUCKET', 'default')
 
 def register_routes(app):
 
-    @app.route('/secret')
+    @app.route('/images')
     @REQUEST_TIME.time()
     @REQUEST_GAUGE.track_inprogress()
-    def secret():
-        logger.info("Secret route accessed")
+    def list_files():
+        logger.info("Images route accessed")
 
-        REQUEST_COUNTER.labels(http_method='POST', url_path='/secret', status_code='200').inc()
+        minio_client = get_minio_client()
+
+        REQUEST_COUNTER.labels(http_method='GET', url_path='/images', status_code='200').inc()
 
         logo = get_image_url('flask-app', 'mb.jpg')
         endpoints = get_endpoints(app)
 
-        secret = get_vault_secret(VAULT_PATH)
+        try:
+            objects = minio_client.list_objects(MINIO_BUCKET)
+        except Exception as err:
+            err = { str(err), 500 }
 
-        return render_template('secret.html', endpoints=endpoints, logo=logo, secret=secret )
+        return render_template('images.html', endpoints=endpoints, logo=logo, objects=objects )
+
+        
+
+

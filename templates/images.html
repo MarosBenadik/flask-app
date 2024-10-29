@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Send Data{% endblock %}
+
+{% block content %}
+    <h1>Images Has been retrieved!</h1>
+    <p>Status: OK</p>
+
+    <h2>Data:</h2>
+    <ul>
+        {% if objects %}
+            {% for object in objects %}
+                <tr>
+                    <td>{{ object }}</td>
+                </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="3">No object found.</td>
+            </tr>
+        {% endif %}
+    </ul>
+{% endblock %}
