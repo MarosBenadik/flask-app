@@ -2,6 +2,7 @@ import os
 from minio import Minio
 from flask import current_app, g
 from tools.vault import get_vault_secret
+from tools.logger import logger
 
 MINIO_ENDPOINT = os.getenv('MINIO_ENDPOINT', 'default')
 MINIO_VAULT_PATH = os.getenv('MINIO_VAULT_PATH', 'default')
