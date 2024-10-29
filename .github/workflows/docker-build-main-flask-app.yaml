@@ -47,10 +47,10 @@ jobs:
             fi
         else
             echo "OLD PATCH: $patch"
-            ((patch++))
-            echo "NEW PATCH: $patch"
+            export newPatch=$(( $patch + 1 ))
+            echo "NEW PATCH: $newPatch"
         fi
-        NEW_VERSION="$major.$minor.$patch"
+        NEW_VERSION="$major.$minor.$newPatch"
 
         # Update the version in the YAML file using yq
         yq eval -i ".app.version = \"$NEW_VERSION\"" flask-helm/values.yaml
