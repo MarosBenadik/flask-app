@@ -12,7 +12,7 @@ def get_minio_client():
     if 'minio' not in g:
         # Initialize MinIO client with your app configuration
         g.minio = Minio(
-            current_app.config["MINIO_ENDPOINT"],
+            MINIO_ENDPOINT,
             access_key=access_key,
             secret_key=secret_key,
             secure=False
