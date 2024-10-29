@@ -26,9 +26,11 @@ def register_routes(app):
 
         logo = get_image_url('flask-app', 'mb.jpg')
         endpoints = get_endpoints(app)
+        
+        list_of_images = []
 
         try:
-            objects = minio_client.list_objects(MINIO_BUCKET)
+            objects = minio_client.list_objects(MINIO_BUCKET).read()
         except Exception as err:
             err = { str(err), 500 }
 
