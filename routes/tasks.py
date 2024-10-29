@@ -11,14 +11,11 @@ from tools.db_creds import MYSQL_HOST, MYSQL_PORT, MYSQL_USER, MYSQL_PASSWORD, M
 from tools.tools import get_endpoints, connect_to_database
 from tools.rabbit_creds import rabbitmq_user, rabbitmq_password
 from tools.image_render import get_image_url
-from tools.rocketchat import send_message
-
 
 def send_message_to_queue(message: str):
     logger.info("Sending ,essage to RabbitMQ")
     credentials = pika.PlainCredentials(rabbitmq_user, rabbitmq_password)
     connection = pika.BlockingConnection(pika.ConnectionParameters(host=rabbitmq_host, port=rabbitmq_port, credentials=credentials))
-    #channel = connection.channel()
 
     # Declare a queue
     channel.queue_declare(queue=RABBITMQ_QUEUE)
