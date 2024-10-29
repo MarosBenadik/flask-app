@@ -1,3 +1,4 @@
+import os
 from minio import Minio
 from flask import current_app, g
 from tools.vault import get_vault_secret

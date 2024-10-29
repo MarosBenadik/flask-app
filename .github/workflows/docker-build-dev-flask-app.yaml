@@ -46,7 +46,9 @@ jobs:
                 ((major++)) # Increment major version if minor rolls over
             fi
         else
-            ((patch++))    # Increment patch version
+            echo "OLD PATCH: $patch"
+            ((patch++))
+            echo "NEW PATCH: $patch"
         fi
         # Construct the new version
         NEW_VERSION="$major.$minor.$patch"
