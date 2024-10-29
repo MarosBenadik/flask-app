@@ -18,7 +18,7 @@ def send_message_to_queue(message: str):
     logger.info("Sending ,essage to RabbitMQ")
     credentials = pika.PlainCredentials(rabbitmq_user, rabbitmq_password)
     connection = pika.BlockingConnection(pika.ConnectionParameters(host=rabbitmq_host, port=rabbitmq_port, credentials=credentials))
-    channel = connection.channel()
+    #channel = connection.channel()
 
     # Declare a queue
     channel.queue_declare(queue=RABBITMQ_QUEUE)
@@ -29,7 +29,7 @@ def send_message_to_queue(message: str):
     # Publish message to rocket channel rabitmq
     send_message(message, "rabitmq")
 
-def register_routes(app: object):
+def register_routes(app):
 
     # Route to render the form to send data
     @app.route('/task/send-data-form', methods=['GET'])
