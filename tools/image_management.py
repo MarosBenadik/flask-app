@@ -8,13 +8,11 @@ MINIO_VAULT_PATH = os.getenv('MINIO_VAULT_PATH', 'default')
 access_key = get_vault_secret(MINIO_VAULT_PATH)['data']['data']['access_key']
 secret_key = get_vault_secret(MINIO_VAULT_PATH)['data']['data']['secret_key']
 
-minio_endpoint = f"http://{MINIO_ENDPOINT}"
-
 def get_minio_client():
     if 'minio' not in g:
         # Initialize MinIO client with your app configuration
         g.minio = Minio(
-            minio_endpoint,
+            MINIO_ENDPOINT,
             access_key=access_key,
             secret_key=secret_key,
             secure=False
