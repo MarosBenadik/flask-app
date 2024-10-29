@@ -8,7 +8,7 @@ from tools.env_vars import NODE_NAME, FLASK_COLOR, FLASK_ENV, FLASK_VERSION
 from tools.logger import logger
 from tools.tools import get_endpoints
 from tools.image_render import get_image_url
-from tools.image_management.py import get_minio_client
+from tools.image_management import get_minio_client
 
 MINIO_BUCKET = os.getenv('MINIO_BUCKET', 'default')
 
